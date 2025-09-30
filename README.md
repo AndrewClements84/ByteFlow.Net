@@ -1,7 +1,7 @@
 # ByteFlow.Net
 
 [![NuGet](https://img.shields.io/nuget/v/ByteFlow.Net.svg)](https://www.nuget.org/packages/ByteFlow.Net)
-[![Build](https://github.com/AndrewClements84/ByteFlow/actions/workflows/dotnet.yml/badge.svg)](https://github.com/AndrewClements84/ByteFlow/actions)
+[![Build](https://github.com/AndrewClements84/ByteFlow/actions/workflows/dotnet.yml/badge.svg)](https://github.com/AndrewClements84/ByteFlow.Net/actions)
 
 A lightweight .NET library for converting bytes into **human-readable formats** (KB, MB, GB, etc.) and back again.
 
