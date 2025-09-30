@@ -2,8 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
+
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
 		
 		<PackageId>ByteFlow.Net</PackageId>
 		<Version>0.1.0</Version>
