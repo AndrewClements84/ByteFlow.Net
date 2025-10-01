@@ -155,5 +155,11 @@
             Assert.False(success);
             Assert.Equal(0, result);
         }
+
+        [Fact]
+        public void ToBytes_InputWithoutSuffix_ShouldThrow()
+        {
+            Assert.Throws<FormatException>(() => "123".ToBytes());
+        }
     }
 }
