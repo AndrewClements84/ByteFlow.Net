@@ -126,5 +126,21 @@
             double expected = 8192 * Math.Pow(1024, 5);
             Assert.Equal((long)expected, result);
         }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(1024)]           // 1 KB
+        [InlineData(1048576)]        // 1 MB
+        [InlineData(1073741824)]     // 1 GB
+        [InlineData(1099511627776)]  // 1 TB
+        public void RoundTrip_BytesToHumanAndBack_ShouldBeConsistent(long original)
+        {
+            string human = original.ToHumanBytes();
+            long parsed = human.ToBytes();
+
+            // Allow slight tolerance because ToHumanBytes() rounds
+            double tolerance = original * 0.01; // 1% margin
+            Assert.InRange(parsed, original - tolerance, original + tolerance);
+        }
     }
 }
