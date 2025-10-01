@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/AndrewClements84/ByteFlow.Net/master/assets/logo.png" alt="ByteFlow.Net Logo" width="200"/>
+</p>
+
 # ByteFlow.Net
 
 [![Build](https://github.com/AndrewClements84/ByteFlow.Net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/AndrewClements84/ByteFlow.Net/actions)
