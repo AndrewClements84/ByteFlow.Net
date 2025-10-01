@@ -63,6 +63,20 @@ dotnet test
 
 ---
 
+## 📊 Code Coverage
+
+Code coverage reports are automatically uploaded to [Codecov](https://app.codecov.io/gh/AndrewClements84/ByteFlow.Net).  
+Current coverage: **~97–100%** depending on build.
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!  
+Feel free to open a [discussion](https://github.com/AndrewClements84/ByteFlow.Net/discussions) or a [pull request](https://github.com/AndrewClements84/ByteFlow.Net/pulls).
+
+---
+
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the MIT License – see the [LICENSE.txt](LICENSE.txt) file for details.
