@@ -7,19 +7,23 @@
 		<Nullable>disable</Nullable>
 		
 		<PackageId>ByteFlow.Net</PackageId>
-		<Version>0.1.0</Version>
+		<Version>0.1.1</Version>
 		<Authors>AndrewClements84</Authors>
 		<Company>ByteFlow</Company>
 		<Description>A lightweight .NET library for converting bytes into human-readable formats (KB, MB, GB, etc.) and back again.</Description>
 		<PackageTags>bytes filesize human-readable utilities conversion ByteFlow</PackageTags>
-		<RepositoryUrl>https://github.com/AndrewClements84/ByteFlow</RepositoryUrl>
+		<RepositoryUrl>https://github.com/AndrewClements84/ByteFlow.net</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/AndrewClements84/ByteFlow.Net</PackageProjectUrl>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 
 </Project>
