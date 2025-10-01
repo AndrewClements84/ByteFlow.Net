@@ -68,7 +68,19 @@ dotnet test
 ## 📊 Code Coverage
 
 Code coverage reports are automatically uploaded to [Codecov](https://app.codecov.io/gh/AndrewClements84/ByteFlow.Net).  
-Current coverage: **~97–100%** depending on build.
+Current coverage: **100%** ✅
+
+---
+
+## 🔮 Roadmap
+
+Planned features for upcoming releases:
+
+- [ ] Support for both **IEC (binary: KiB, MiB)** and **SI (decimal: KB, MB)** unit standards  
+- [ ] Culture-aware parsing (e.g., commas vs dots for decimals)  
+- [ ] Customizable suffix sets (allowing non-standard units)  
+- [ ] Performance benchmarking and optimizations for very large inputs  
+- [ ] Additional helpers for formatting with alignment/padding  
 
 ---
 
