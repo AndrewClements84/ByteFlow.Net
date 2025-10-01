@@ -60,6 +60,17 @@
         }
 
         [Fact]
+        public void TryParseHumanBytes_ValidInput_ShouldReturnTrue()
+        {
+            // Act
+            bool success = "1 MB".TryParseHumanBytes(out long result);
+
+            // Assert
+            Assert.True(success);
+            Assert.Equal(1048576, result);
+        }
+
+        [Fact]
         public void TryParseHumanBytes_ShouldReturnFalseOnInvalidInput()
         {
             bool success = "not a size".TryParseHumanBytes(out long result);
