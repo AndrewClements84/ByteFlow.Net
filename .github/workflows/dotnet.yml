@@ -21,12 +21,12 @@ jobs:
 
     - name: Restore
       run: dotnet restore ByteFlow.sln
-      working-directory: ./ByteFlow.Net
+      working-directory: .
 
     - name: Build
       run: dotnet build ByteFlow.sln --no-restore --configuration Release
-      working-directory: ./ByteFlow.Net
+      working-directory: .
 
     - name: Test with coverage
       run: dotnet test ByteFlow.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
-      working-directory: ./ByteFlow.Net
+      working-directory: .
