@@ -81,5 +81,50 @@
             Assert.False(success);
             Assert.Equal(0, result);
         }
+
+        [Fact]
+        public void ToHumanBytes_ShouldThrowOnNegativeInput()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => (-1L).ToHumanBytes());
+        }
+
+        [Fact]
+        public void ToHumanBytes_ShouldHandleZero()
+        {
+            string result = 0L.ToHumanBytes();
+            Assert.Equal("0 B", result);
+        }
+
+        [Fact]
+        public void ToBytes_Whitespace_ShouldThrow()
+        {
+            Assert.Throws<ArgumentNullException>(() => "   ".ToBytes());
+        }
+
+        [Fact]
+        public void ToBytes_ShouldSupportPetabytes()
+        {
+            string input = "1 PB";
+            long result = input.ToBytes();
+
+            // 1 PB = 1024^5 bytes
+            Assert.Equal((long)Math.Pow(1024, 5), result);
+        }
+
+        [Fact]
+        public void ToHumanBytes_ShouldHandleLongMaxValue()
+        {
+            string result = long.MaxValue.ToHumanBytes();
+            Assert.Contains("PB", result); // should be expressed in petabytes
+        }
+
+        [Fact]
+        public void ToBytes_ShouldHandleVeryLargePetabytes()
+        {
+            string input = "8192 PB";
+            long result = input.ToBytes();
+            double expected = 8192 * Math.Pow(1024, 5);
+            Assert.Equal((long)expected, result);
+        }
     }
 }

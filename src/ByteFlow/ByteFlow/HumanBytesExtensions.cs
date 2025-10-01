@@ -25,6 +25,11 @@ namespace ByteFlow
                 return $"0 {SizeSuffixes[0]}";
 
             int mag = (int)Math.Log(bytes, 1024);
+            if (mag >= SizeSuffixes.Length)
+            {
+                mag = SizeSuffixes.Length - 1; // clamp to PB
+            }
+
             double adjustedSize = bytes / Math.Pow(1024, mag);
 
             return string.Format(CultureInfo.InvariantCulture,
