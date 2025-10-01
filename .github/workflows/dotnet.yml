@@ -14,19 +14,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: List repo contents
+      run: ls -R
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
 
     - name: Restore
-      run: dotnet restore ByteFlow.sln
-      working-directory: .
+      run: dotnet restore ./ByteFlow.sln
 
     - name: Build
-      run: dotnet build ByteFlow.sln --no-restore --configuration Release
-      working-directory: .
+      run: dotnet build ./ByteFlow.sln --no-restore --configuration Release
 
     - name: Test with coverage
-      run: dotnet test ByteFlow.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
-      working-directory: .
+      run: dotnet test ./ByteFlow.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
