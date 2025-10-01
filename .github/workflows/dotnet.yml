@@ -20,13 +20,10 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore
-      run: dotnet restore
-      working-directory: ./ByteFlow.Net
+      run: dotnet restore ./ByteFlow.Net/ByteFlow.sln
 
     - name: Build
-      run: dotnet build --no-restore --configuration Release
-      working-directory: ./ByteFlow.Net
+      run: dotnet build ./ByteFlow.Net/ByteFlow.sln --no-restore --configuration Release
 
     - name: Test with coverage
-      run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
-      working-directory: ./ByteFlow.Net
+      run: dotnet test ./ByteFlow.Net/ByteFlow.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
