@@ -142,5 +142,18 @@
             double tolerance = original * 0.01; // 1% margin
             Assert.InRange(parsed, original - tolerance, original + tolerance);
         }
+
+        [Theory]
+        [InlineData("NotBytes")]
+        [InlineData("123 QZ")]   // invalid suffix
+        [InlineData("1.2.3 GB")] // malformed number
+        public void RoundTrip_InvalidStrings_ShouldFailGracefully(string input)
+        {
+
+            bool success = input.TryParseHumanBytes(out long result);
+
+            Assert.False(success);
+            Assert.Equal(0, result);
+        }
     }
 }
