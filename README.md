@@ -6,7 +6,7 @@
 
 [![Build](https://github.com/AndrewClements84/ByteFlow.Net/actions/workflows/dotnet.yml/badge.svg)](https://github.com/AndrewClements84/ByteFlow.Net/actions)
 [![codecov](https://codecov.io/gh/AndrewClements84/ByteFlow.Net/branch/master/graph/badge.svg)](https://codecov.io/gh/AndrewClements84/ByteFlow.Net)
-[![NuGet](https://img.shields.io/nuget/v/ByteFlow.Net.svg)](https://www.nuget.org/packages/ByteFlow.Net)
+[![NuGet Version](https://img.shields.io/nuget/v/ByteFlow.Net.svg)](https://www.nuget.org/packages/ByteFlow.Net)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/ByteFlow.Net.svg)](https://www.nuget.org/packages/ByteFlow.Net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
 
