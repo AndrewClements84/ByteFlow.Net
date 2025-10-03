@@ -7,35 +7,26 @@ namespace ByteFlow
     /// <summary>
     /// Provides extension methods for converting between raw byte counts and human-readable sizes.
     /// Supports both IEC (binary: KiB, MiB, GiB) and SI (decimal: KB, MB, GB) unit standards,
-    /// and allows culture-aware formatting and parsing.
+    /// allows culture-aware formatting and parsing, and supports custom suffix sets.
     /// </summary>
     public static class HumanBytesExtensions
     {
         /// <summary>
         /// Converts a number of bytes into a human-readable string using either
-        /// SI (decimal: KB, MB, GB) or IEC (binary: KiB, MiB, GiB) units.
+        /// SI (decimal: KB, MB, GB) or IEC (binary: KiB, MiB, GiB) units,
+        /// or a custom suffix set if provided.
         /// </summary>
-        /// <param name="bytes">The size in bytes.</param>
-        /// <param name="decimalPlaces">Number of decimal places to display.</param>
-        /// <param name="standard">Whether to use SI (base 1000) or IEC (base 1024) units.</param>
-        /// <param name="formatProvider">
-        /// The culture to use for formatting (e.g. decimal separator). 
-        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>.
-        /// </param>
-        /// <returns>
-        /// A formatted string such as "1.23 MB" (SI, en-US) or "1,23 MB" (SI, de-DE).
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="bytes"/> is negative.</exception>
         public static string ToHumanBytes(
             this long bytes,
             int decimalPlaces = 2,
             UnitStandard standard = UnitStandard.IEC,
-            IFormatProvider formatProvider = null)
+            IFormatProvider formatProvider = null,
+            (string Symbol, double Factor)[] customSuffixes = null)
         {
             if (bytes < 0)
                 throw new ArgumentOutOfRangeException(nameof(bytes), "Value must be non-negative.");
 
-            var suffixes = standard == UnitStandard.SI ? SiSuffixes : IecSuffixes;
+            var suffixes = customSuffixes ?? (standard == UnitStandard.SI ? SiSuffixes : IecSuffixes);
 
             if (bytes == 0)
                 return $"0 {suffixes[0].Symbol}";
@@ -57,28 +48,37 @@ namespace ByteFlow
         }
 
         /// <summary>
-        /// Parses a human-readable size string (e.g. "2.5 GB" or "2,5 GiB") back into bytes,
-        /// using either SI (decimal) or IEC (binary) interpretation.
+        /// Converts a number of bytes into a human-readable string,
+        /// padded to a given width for alignment.
         /// </summary>
-        /// <param name="input">The input string, e.g. "1 KB", "1 KiB", "2.5 MB".</param>
-        /// <param name="standard">Whether to interpret units as SI (base 1000) or IEC (base 1024).</param>
-        /// <param name="formatProvider">
-        /// The culture to use for parsing (e.g. decimal separator).
-        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>.
-        /// </param>
-        /// <returns>The size in bytes.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="input"/> is null or whitespace.</exception>
-        /// <exception cref="FormatException">Thrown if the input string cannot be parsed.</exception>
+        public static string ToHumanBytesAligned(
+            this long bytes,
+            int decimalPlaces = 2,
+            UnitStandard standard = UnitStandard.IEC,
+            int width = 10,
+            char paddingChar = ' ',
+            IFormatProvider formatProvider = null,
+            (string Symbol, double Factor)[] customSuffixes = null)
+        {
+            var s = ToHumanBytes(bytes, decimalPlaces, standard, formatProvider, customSuffixes);
+            return s.PadLeft(width, paddingChar);
+        }
+
+        /// <summary>
+        /// Parses a human-readable size string back into bytes,
+        /// using either SI (decimal), IEC (binary), or a custom suffix set if provided.
+        /// </summary>
         public static long ToBytes(
             this string input,
             UnitStandard standard = UnitStandard.IEC,
-            IFormatProvider formatProvider = null)
+            IFormatProvider formatProvider = null,
+            (string Symbol, double Factor)[] customSuffixes = null)
         {
             if (string.IsNullOrWhiteSpace(input))
                 throw new ArgumentNullException(nameof(input));
 
             input = input.Trim();
-            var suffixes = standard == UnitStandard.SI ? SiSuffixes : IecSuffixes;
+            var suffixes = customSuffixes ?? (standard == UnitStandard.SI ? SiSuffixes : IecSuffixes);
 
             foreach (var (symbol, factor) in suffixes.OrderByDescending(s => s.Symbol.Length))
             {
@@ -101,11 +101,7 @@ namespace ByteFlow
 
         /// <summary>
         /// Safely parses a human-readable string into bytes.
-        /// Returns <c>true</c> if parsing succeeds; otherwise <c>false</c>.
         /// </summary>
-        /// <param name="input">The input string.</param>
-        /// <param name="result">The parsed byte value if successful, or 0 otherwise.</param>
-        /// <returns><c>true</c> if parsing was successful; otherwise <c>false</c>.</returns>
         public static bool TryParseHumanBytes(this string input, out long result)
         {
             try
@@ -121,25 +117,19 @@ namespace ByteFlow
         }
 
         /// <summary>
-        /// Safely parses a human-readable string into bytes, using either SI (decimal) or IEC (binary) units.
+        /// Safely parses a human-readable string into bytes,
+        /// supporting SI, IEC, or custom suffix sets.
         /// </summary>
-        /// <param name="input">The input string (e.g. "1 KB", "1 KiB", "2.5 MB").</param>
-        /// <param name="result">The parsed byte value if successful, or 0 otherwise.</param>
-        /// <param name="standard">Whether to interpret units as SI (base 1000) or IEC (base 1024).</param>
-        /// <param name="formatProvider">
-        /// The culture to use for parsing (e.g. decimal separator).
-        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>.
-        /// </param>
-        /// <returns><c>true</c> if parsing was successful; otherwise <c>false</c>.</returns>
         public static bool TryParseHumanBytes(
             this string input,
             out long result,
             UnitStandard standard = UnitStandard.IEC,
-            IFormatProvider formatProvider = null)
+            IFormatProvider formatProvider = null,
+            (string Symbol, double Factor)[] customSuffixes = null)
         {
             try
             {
-                result = input.ToBytes(standard, formatProvider);
+                result = input.ToBytes(standard, formatProvider, customSuffixes);
                 return true;
             }
             catch
@@ -149,7 +139,7 @@ namespace ByteFlow
             }
         }
 
-        // --- Unit suffix definitions ---
+        // --- Default suffix definitions ---
 
         private static readonly (string Symbol, double Factor)[] SiSuffixes =
         {

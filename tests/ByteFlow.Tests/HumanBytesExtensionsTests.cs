@@ -37,6 +37,21 @@ namespace ByteFlow.Tests
         }
 
         [Fact]
+        public void ToHumanBytes_ShouldSupportCustomSuffixes()
+        {
+            var custom = new[] { ("X", 1d), ("KX", 1000d), ("MX", 1000000d) };
+            string result = 2000L.ToHumanBytes(2, UnitStandard.SI, null, custom);
+            Assert.Equal("2.00 KX", result);
+        }
+
+        [Fact]
+        public void ToHumanBytesAligned_ShouldPadCorrectly()
+        {
+            string result = 1234L.ToHumanBytesAligned(2, UnitStandard.SI, width: 12, paddingChar: '_');
+            Assert.Equal("_____1.23 KB", result); // 5 underscores, total length 12
+        }
+
+        [Fact]
         public void ToHumanBytes_ShouldThrowOnNegativeInput()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => (-1L).ToHumanBytes());
@@ -83,6 +98,14 @@ namespace ByteFlow.Tests
             var culture = new CultureInfo(cultureName);
             long result = input.ToBytes(standard, culture);
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void ToBytes_ShouldSupportCustomSuffixes()
+        {
+            var custom = new[] { ("X", 1d), ("KX", 1000d), ("MX", 1000000d) };
+            long result = "2 KX".ToBytes(UnitStandard.SI, null, custom);
+            Assert.Equal(2000, result);
         }
 
         [Fact]
@@ -148,7 +171,6 @@ namespace ByteFlow.Tests
         public void TryParseHumanBytes_DefaultOverload_ShouldReturnTrue()
         {
             bool success = "1 KiB".TryParseHumanBytes(out long result);
-
             Assert.True(success);
             Assert.Equal(1024, result); // uses default IEC
         }
@@ -157,7 +179,6 @@ namespace ByteFlow.Tests
         public void TryParseHumanBytes_DefaultOverload_ShouldReturnFalseOnInvalid()
         {
             bool success = "invalid".TryParseHumanBytes(out long result);
-
             Assert.False(success);
             Assert.Equal(0, result);
         }
@@ -180,6 +201,16 @@ namespace ByteFlow.Tests
 
             Assert.True(success);
             Assert.Equal((long)(2.5 * 1024 * 1024), result);
+        }
+
+        [Fact]
+        public void TryParseHumanBytes_ShouldSupportCustomSuffixes()
+        {
+            var custom = new[] { ("X", 1d), ("KX", 1000d) };
+            bool success = "5 KX".TryParseHumanBytes(out long result, UnitStandard.SI, null, custom);
+
+            Assert.True(success);
+            Assert.Equal(5000, result);
         }
 
         [Theory]
@@ -207,6 +238,17 @@ namespace ByteFlow.Tests
         {
             string human = original.ToHumanBytes(2, standard);
             long parsed = human.ToBytes(standard);
+            Assert.Equal(original, parsed);
+        }
+
+        [Fact]
+        public void RoundTrip_WithCustomSuffixes_ShouldBeConsistent()
+        {
+            var custom = new[] { ("X", 1d), ("KX", 1000d), ("MX", 1000000d) };
+            long original = 5000;
+            string human = original.ToHumanBytes(2, UnitStandard.SI, null, custom);
+            long parsed = human.ToBytes(UnitStandard.SI, null, custom);
+
             Assert.Equal(original, parsed);
         }
     }
