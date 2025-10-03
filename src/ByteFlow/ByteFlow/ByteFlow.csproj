@@ -7,11 +7,22 @@
 		<Nullable>disable</Nullable>
 		
 		<PackageId>ByteFlow.Net</PackageId>
-		<Version>0.1.1</Version>
+		<Version>0.2.0</Version>
 		<Authors>AndrewClements84</Authors>
 		<Company>ByteFlow</Company>
-		<Description>A lightweight .NET library for converting bytes into human-readable formats (KB, MB, GB, etc.) and back again.</Description>
-		<PackageTags>bytes filesize human-readable utilities conversion ByteFlow</PackageTags>
+    <Description>
+      ByteFlow.Net is a zero-dependency .NET library for converting raw byte values to and from human-readable formats.
+
+      Features:
+      - Supports both IEC (KiB, MiB, GiB) and SI (KB, MB, GB) unit standards
+      - Culture-aware parsing and formatting (e.g., 1.5 MB vs 1,5 MB)
+      - Customizable suffix sets for non-standard or domain-specific units
+      - Alignment/padding helpers for clean console and tabular output
+      - Fully tested with 100% code coverage
+
+      Ideal for developers needing clear, reliable byte size conversions in .NET applications — with no external dependencies.
+    </Description>
+    <PackageTags>bytes filesize human-readable utilities conversion ByteFlow SI IEC culture-aware</PackageTags>
 		<RepositoryUrl>https://github.com/AndrewClements84/ByteFlow.net</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
