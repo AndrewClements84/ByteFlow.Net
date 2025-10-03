@@ -6,20 +6,31 @@ namespace ByteFlow
 {
     /// <summary>
     /// Provides extension methods for converting between raw byte counts and human-readable sizes.
+    /// Supports both IEC (binary: KiB, MiB, GiB) and SI (decimal: KB, MB, GB) unit standards,
+    /// and allows culture-aware formatting and parsing.
     /// </summary>
     public static class HumanBytesExtensions
     {
-        private static readonly string[] SizeSuffixes = { "B", "KB", "MB", "GB", "TB", "PB" };
-
         /// <summary>
-        /// Converts a number of bytes into a human-readable string
-        /// using either SI (decimal: KB, MB, GB) or IEC (binary: KiB, MiB, GiB) units.
+        /// Converts a number of bytes into a human-readable string using either
+        /// SI (decimal: KB, MB, GB) or IEC (binary: KiB, MiB, GiB) units.
         /// </summary>
         /// <param name="bytes">The size in bytes.</param>
         /// <param name="decimalPlaces">Number of decimal places to display.</param>
         /// <param name="standard">Whether to use SI (base 1000) or IEC (base 1024) units.</param>
-        /// <returns>A formatted string such as "1.23 MB" (SI) or "1.18 MiB" (IEC).</returns>
-        public static string ToHumanBytes(this long bytes, int decimalPlaces = 2, UnitStandard standard = UnitStandard.IEC)
+        /// <param name="formatProvider">
+        /// The culture to use for formatting (e.g. decimal separator). 
+        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>.
+        /// </param>
+        /// <returns>
+        /// A formatted string such as "1.23 MB" (SI, en-US) or "1,23 MB" (SI, de-DE).
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="bytes"/> is negative.</exception>
+        public static string ToHumanBytes(
+            this long bytes,
+            int decimalPlaces = 2,
+            UnitStandard standard = UnitStandard.IEC,
+            IFormatProvider formatProvider = null)
         {
             if (bytes < 0)
                 throw new ArgumentOutOfRangeException(nameof(bytes), "Value must be non-negative.");
@@ -40,18 +51,28 @@ namespace ByteFlow
             }
 
             double adjusted = bytes / suffixes[mag].Factor;
-            return string.Format(CultureInfo.InvariantCulture,
-                $"{{0:F{decimalPlaces}}} {{1}}", adjusted, suffixes[mag].Symbol);
+            string number = adjusted.ToString($"F{decimalPlaces}", formatProvider ?? CultureInfo.InvariantCulture);
+
+            return $"{number} {suffixes[mag].Symbol}";
         }
 
         /// <summary>
-        /// Parses a human-readable size string (e.g. "2.5 GB" or "2.5 GiB")
-        /// back into bytes, using either SI (decimal) or IEC (binary) interpretation.
+        /// Parses a human-readable size string (e.g. "2.5 GB" or "2,5 GiB") back into bytes,
+        /// using either SI (decimal) or IEC (binary) interpretation.
         /// </summary>
-        /// <param name="input">The input string, e.g. "1 KB", "1 KiB", "1 MB".</param>
+        /// <param name="input">The input string, e.g. "1 KB", "1 KiB", "2.5 MB".</param>
         /// <param name="standard">Whether to interpret units as SI (base 1000) or IEC (base 1024).</param>
+        /// <param name="formatProvider">
+        /// The culture to use for parsing (e.g. decimal separator).
+        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>.
+        /// </param>
         /// <returns>The size in bytes.</returns>
-        public static long ToBytes(this string input, UnitStandard standard = UnitStandard.IEC)
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="input"/> is null or whitespace.</exception>
+        /// <exception cref="FormatException">Thrown if the input string cannot be parsed.</exception>
+        public static long ToBytes(
+            this string input,
+            UnitStandard standard = UnitStandard.IEC,
+            IFormatProvider formatProvider = null)
         {
             if (string.IsNullOrWhiteSpace(input))
                 throw new ArgumentNullException(nameof(input));
@@ -64,8 +85,13 @@ namespace ByteFlow
                 if (input.EndsWith(symbol, StringComparison.OrdinalIgnoreCase))
                 {
                     var numberPart = input.Substring(0, input.Length - symbol.Length).Trim();
-                    if (!double.TryParse(numberPart, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+                    if (!double.TryParse(
+                            numberPart,
+                            NumberStyles.Float,
+                            formatProvider ?? CultureInfo.InvariantCulture,
+                            out var value))
                         throw new FormatException($"Invalid number format: {numberPart}");
+
                     return (long)(value * factor);
                 }
             }
@@ -74,19 +100,17 @@ namespace ByteFlow
         }
 
         /// <summary>
-        /// Safely parses a human-readable string into bytes, using either SI (decimal) or IEC (binary) units.
+        /// Safely parses a human-readable string into bytes.
+        /// Returns <c>true</c> if parsing succeeds; otherwise <c>false</c>.
         /// </summary>
-        /// <param name="input">The input string (e.g. "1 KB", "1 KiB", "2.5 MB").</param>
-        /// <param name="result">The parsed byte value if successful, or 0 if parsing fails.</param>
-        /// <param name="standard">Whether to interpret units as SI (base 1000) or IEC (base 1024).</param>
-        /// <returns>
-        /// <c>true</c> if parsing was successful; otherwise <c>false</c>.
-        /// </returns>
-        public static bool TryParseHumanBytes(this string input, out long result, UnitStandard standard = UnitStandard.IEC)
+        /// <param name="input">The input string.</param>
+        /// <param name="result">The parsed byte value if successful, or 0 otherwise.</param>
+        /// <returns><c>true</c> if parsing was successful; otherwise <c>false</c>.</returns>
+        public static bool TryParseHumanBytes(this string input, out long result)
         {
             try
             {
-                result = input.ToBytes(standard);
+                result = input.ToBytes();
                 return true;
             }
             catch
@@ -95,6 +119,37 @@ namespace ByteFlow
                 return false;
             }
         }
+
+        /// <summary>
+        /// Safely parses a human-readable string into bytes, using either SI (decimal) or IEC (binary) units.
+        /// </summary>
+        /// <param name="input">The input string (e.g. "1 KB", "1 KiB", "2.5 MB").</param>
+        /// <param name="result">The parsed byte value if successful, or 0 otherwise.</param>
+        /// <param name="standard">Whether to interpret units as SI (base 1000) or IEC (base 1024).</param>
+        /// <param name="formatProvider">
+        /// The culture to use for parsing (e.g. decimal separator).
+        /// Defaults to <see cref="CultureInfo.InvariantCulture"/>.
+        /// </param>
+        /// <returns><c>true</c> if parsing was successful; otherwise <c>false</c>.</returns>
+        public static bool TryParseHumanBytes(
+            this string input,
+            out long result,
+            UnitStandard standard = UnitStandard.IEC,
+            IFormatProvider formatProvider = null)
+        {
+            try
+            {
+                result = input.ToBytes(standard, formatProvider);
+                return true;
+            }
+            catch
+            {
+                result = 0;
+                return false;
+            }
+        }
+
+        // --- Unit suffix definitions ---
 
         private static readonly (string Symbol, double Factor)[] SiSuffixes =
         {

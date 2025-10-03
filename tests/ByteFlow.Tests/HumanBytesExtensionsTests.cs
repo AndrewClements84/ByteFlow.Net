@@ -1,4 +1,6 @@
-﻿namespace ByteFlow.Tests
+﻿using System.Globalization;
+
+namespace ByteFlow.Tests
 {
     public class HumanBytesExtensionsTests
     {
@@ -27,6 +29,14 @@
         }
 
         [Fact]
+        public void ToHumanBytes_ShouldRespectCulture()
+        {
+            var de = new CultureInfo("de-DE"); // comma decimal separator
+            string result = 1234567L.ToHumanBytes(2, UnitStandard.SI, de);
+            Assert.Equal("1,23 MB", result);
+        }
+
+        [Fact]
         public void ToHumanBytes_ShouldThrowOnNegativeInput()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => (-1L).ToHumanBytes());
@@ -43,7 +53,7 @@
         public void ToHumanBytes_ShouldHandleLongMaxValue()
         {
             string result = long.MaxValue.ToHumanBytes();
-            Assert.Contains("PiB", result); // should be expressed in largest unit
+            Assert.Contains("PiB", result); // expressed in largest IEC unit
         }
 
         // --- Parsing (ToBytes) ---
@@ -61,6 +71,17 @@
         public void ToBytes_ShouldParseCorrectly(string input, long expected, UnitStandard standard)
         {
             long result = input.ToBytes(standard);
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("1,5 MB", 1500000, "de-DE", UnitStandard.SI)]
+        [InlineData("1.5 MB", 1500000, "en-US", UnitStandard.SI)]
+        [InlineData("2,5 GiB", 2684354560, "de-DE", UnitStandard.IEC)]
+        public void ToBytes_ShouldParseAccordingToCulture(string input, long expected, string cultureName, UnitStandard standard)
+        {
+            var culture = new CultureInfo(cultureName);
+            long result = input.ToBytes(standard, culture);
             Assert.Equal(expected, result);
         }
 
@@ -133,6 +154,16 @@
             Assert.Equal(expected, result);
         }
 
+        [Fact]
+        public void TryParseHumanBytes_ShouldRespectCulture()
+        {
+            var de = new CultureInfo("de-DE");
+            bool success = "2,5 MiB".TryParseHumanBytes(out long result, UnitStandard.IEC, de);
+
+            Assert.True(success);
+            Assert.Equal((long)(2.5 * 1024 * 1024), result);
+        }
+
         [Theory]
         [InlineData("1 XB", UnitStandard.SI)]
         [InlineData("ten MB", UnitStandard.SI)]
@@ -158,7 +189,6 @@
         {
             string human = original.ToHumanBytes(2, standard);
             long parsed = human.ToBytes(standard);
-
             Assert.Equal(original, parsed);
         }
     }
