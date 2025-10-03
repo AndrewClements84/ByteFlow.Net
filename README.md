@@ -14,7 +14,7 @@
 A lightweight .NET library for converting bytes into **human-readable
 formats** (KB, MB, GB, etc.) and back again.
 
-------------------------------------------------------------------------
+---
 
 ## ✨ Features
 
@@ -25,7 +25,7 @@ formats** (KB, MB, GB, etc.) and back again.
 -   Works on .NET Framework (4.6.1+) and all modern .NET versions (Core,
     5/6/7/8).
 
-------------------------------------------------------------------------
+---
 
 ## 📦 Installation
 
@@ -35,7 +35,7 @@ Install from [NuGet](https://www.nuget.org/packages/ByteFlow.Net):
 dotnet add package ByteFlow.Net
 ```
 
-------------------------------------------------------------------------
+---
 
 ## 🚀 Usage
 
@@ -58,7 +58,7 @@ if ("10 MB".TryParseHumanBytes(out var val))
 }
 ```
 
-------------------------------------------------------------------------
+---
 
 ## 🧪 Unit Tests
 
@@ -71,7 +71,7 @@ Run them with:
 dotnet test
 ```
 
-------------------------------------------------------------------------
+---
 
 ## 📊 Code Coverage
 
@@ -79,7 +79,7 @@ Code coverage reports are automatically uploaded to
 [Codecov](https://app.codecov.io/gh/AndrewClements84/ByteFlow.Net).\
 Current coverage: **100%** ✅
 
-------------------------------------------------------------------------
+---
 
 ## 🔮 Roadmap
 
@@ -93,7 +93,7 @@ Planned features for upcoming releases:
     inputs\
 -   [ ] Additional helpers for formatting with alignment/padding
 
-------------------------------------------------------------------------
+---
 
 ## 🤝 Contributing
 
@@ -103,14 +103,14 @@ Feel free to open a
 or a [pull
 request](https://github.com/AndrewClements84/ByteFlow.Net/pulls).
 
-------------------------------------------------------------------------
+---
 
 ## ⭐ Support
 
 If you find **ByteFlow.Net** useful, please consider giving it a star on
 GitHub --- it helps others discover the project and shows your support.
 
-------------------------------------------------------------------------
+---
 
 
 ## 📄 License
