@@ -2,14 +2,19 @@
 {
     public class HumanBytesExtensionsTests
     {
+        // --- Formatting (ToHumanBytes) ---
+
         [Theory]
-        [InlineData(0, "0 B")]
-        [InlineData(1023, "1023.00 B")]
-        [InlineData(1024, "1.00 KB")]
-        [InlineData(1048576, "1.00 MB")]
-        public void ToHumanBytes_ShouldConvertCorrectly(long input, string expected)
+        [InlineData(0, "0 B", UnitStandard.IEC)]
+        [InlineData(1023, "1023.00 B", UnitStandard.IEC)]
+        [InlineData(1024, "1.00 KiB", UnitStandard.IEC)]
+        [InlineData(1048576, "1.00 MiB", UnitStandard.IEC)]
+        [InlineData(1000, "1.00 KB", UnitStandard.SI)]
+        [InlineData(1500, "1.50 KB", UnitStandard.SI)]
+        [InlineData(1_000_000, "1.00 MB", UnitStandard.SI)]
+        public void ToHumanBytes_ShouldFormatCorrectly(long input, string expected, UnitStandard standard)
         {
-            string result = input.ToHumanBytes();
+            string result = input.ToHumanBytes(2, standard);
             Assert.Equal(expected, result);
         }
 
@@ -17,80 +22,8 @@
         public void ToHumanBytes_ShouldRespectDecimalPlaces()
         {
             long input = 1234567;
-            string result = input.ToHumanBytes(3);
-
-            Assert.Equal("1.177 MB", result);
-        }
-
-        [Theory]
-        [InlineData("1 KB", 1024)]
-        [InlineData("1 MB", 1048576)]
-        [InlineData("2.5 GB", 2684354560)]
-        [InlineData("1B", 1)]
-        [InlineData("1KB", 1024)]
-        [InlineData(" 1 MB", 1048576)]
-        [InlineData("2 GB ", 2147483648)]
-        public void ToBytes_ShouldParseCorrectly(string input, long expected)
-        {
-            long result = input.ToBytes();
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void ToBytes_InvalidString_ShouldThrow()
-        {
-            Assert.Throws<FormatException>(() => "invalid".ToBytes());
-        }
-
-        [Theory]
-        [InlineData("1 XB")]       // unsupported unit
-        [InlineData("ten MB")]     // not a number
-        [InlineData("1.2.3 GB")]   // malformed number
-        [InlineData(" ")]          // empty after trim
-        public void ToBytes_InvalidInputs_ShouldThrow(string input)
-        {
-            Assert.ThrowsAny<Exception>(() => input.ToBytes());
-        }
-
-        [Fact]
-        public void ToBytes_Null_ShouldThrow()
-        {
-            string input = null;
-            Assert.Throws<ArgumentNullException>(() => input.ToBytes());
-        }
-
-        [Fact]
-        public void TryParseHumanBytes_ValidInput_ShouldReturnTrue()
-        {
-            // Act
-            bool success = "1 MB".TryParseHumanBytes(out long result);
-
-            // Assert
-            Assert.True(success);
-            Assert.Equal(1048576, result);
-        }
-
-        [Fact]
-        public void TryParseHumanBytes_ShouldReturnFalseOnInvalidInput()
-        {
-            bool success = "not a size".TryParseHumanBytes(out long result);
-
-            Assert.False(success);
-            Assert.Equal(0, result);
-        }
-
-        [Theory]
-        [InlineData("1 XB")]
-        [InlineData("ten MB")]
-        [InlineData("1.2.3 GB")]
-        [InlineData(" ")]
-        [InlineData(null)]
-        public void TryParseHumanBytes_InvalidInputs_ShouldReturnFalse(string input)
-        {
-            bool success = input.TryParseHumanBytes(out long result);
-
-            Assert.False(success);
-            Assert.Equal(0, result);
+            string result = input.ToHumanBytes(3, UnitStandard.SI);
+            Assert.Equal("1.235 MB", result); // 1234567 / 1e6 = 1.234567
         }
 
         [Fact]
@@ -107,70 +40,126 @@
         }
 
         [Fact]
+        public void ToHumanBytes_ShouldHandleLongMaxValue()
+        {
+            string result = long.MaxValue.ToHumanBytes();
+            Assert.Contains("PiB", result); // should be expressed in largest unit
+        }
+
+        // --- Parsing (ToBytes) ---
+
+        [Theory]
+        [InlineData("1 KiB", 1024, UnitStandard.IEC)]
+        [InlineData("1 MiB", 1048576, UnitStandard.IEC)]
+        [InlineData("2.5 GiB", 2684354560, UnitStandard.IEC)]
+        [InlineData("1 KB", 1000, UnitStandard.SI)]
+        [InlineData("1 MB", 1000000, UnitStandard.SI)]
+        [InlineData("2 GB", 2000000000, UnitStandard.SI)]
+        [InlineData("1B", 1, UnitStandard.IEC)]
+        [InlineData(" 1 MB", 1000000, UnitStandard.SI)]
+        [InlineData("2 GB ", 2000000000, UnitStandard.SI)]
+        public void ToBytes_ShouldParseCorrectly(string input, long expected, UnitStandard standard)
+        {
+            long result = input.ToBytes(standard);
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void ToBytes_InvalidString_ShouldThrow()
+        {
+            Assert.Throws<FormatException>(() => "invalid".ToBytes());
+        }
+
+        [Theory]
+        [InlineData("1 XB")]
+        [InlineData("ten MB")]
+        [InlineData("1.2.3 GB")]
+        [InlineData(" ")]
+        [InlineData(null)]
+        public void ToBytes_InvalidInputs_ShouldThrow(string input)
+        {
+            if (input is null)
+                Assert.Throws<ArgumentNullException>(() => input.ToBytes());
+            else
+                Assert.ThrowsAny<Exception>(() => input.ToBytes());
+        }
+
+        [Fact]
         public void ToBytes_Whitespace_ShouldThrow()
         {
             Assert.Throws<ArgumentNullException>(() => "   ".ToBytes());
         }
 
         [Fact]
-        public void ToBytes_ShouldSupportPetabytes()
+        public void ToBytes_ShouldSupportPetabytes_IEC()
         {
-            string input = "1 PB";
-            long result = input.ToBytes();
-
-            // 1 PB = 1024^5 bytes
+            string input = "1 PiB";
+            long result = input.ToBytes(UnitStandard.IEC);
             Assert.Equal((long)Math.Pow(1024, 5), result);
         }
 
         [Fact]
-        public void ToHumanBytes_ShouldHandleLongMaxValue()
+        public void ToBytes_ShouldSupportPetabytes_SI()
         {
-            string result = long.MaxValue.ToHumanBytes();
-            Assert.Contains("PB", result); // should be expressed in petabytes
+            string input = "1 PB";
+            long result = input.ToBytes(UnitStandard.SI);
+            Assert.Equal((long)Math.Pow(10, 15), result);
         }
 
         [Fact]
         public void ToBytes_ShouldHandleVeryLargePetabytes()
         {
-            string input = "8192 PB";
-            long result = input.ToBytes();
+            string input = "8192 PiB";
+            long result = input.ToBytes(UnitStandard.IEC);
             double expected = 8192 * Math.Pow(1024, 5);
             Assert.Equal((long)expected, result);
-        }
-
-        [Theory]
-        [InlineData(1)]
-        [InlineData(1024)]           // 1 KB
-        [InlineData(1048576)]        // 1 MB
-        [InlineData(1073741824)]     // 1 GB
-        [InlineData(1099511627776)]  // 1 TB
-        public void RoundTrip_BytesToHumanAndBack_ShouldBeConsistent(long original)
-        {
-            string human = original.ToHumanBytes();
-            long parsed = human.ToBytes();
-
-            // Allow slight tolerance because ToHumanBytes() rounds
-            double tolerance = original * 0.01; // 1% margin
-            Assert.InRange(parsed, original - tolerance, original + tolerance);
-        }
-
-        [Theory]
-        [InlineData("NotBytes")]
-        [InlineData("123 QZ")]   // invalid suffix
-        [InlineData("1.2.3 GB")] // malformed number
-        public void RoundTrip_InvalidStrings_ShouldFailGracefully(string input)
-        {
-
-            bool success = input.TryParseHumanBytes(out long result);
-
-            Assert.False(success);
-            Assert.Equal(0, result);
         }
 
         [Fact]
         public void ToBytes_InputWithoutSuffix_ShouldThrow()
         {
             Assert.Throws<FormatException>(() => "123".ToBytes());
+        }
+
+        // --- TryParseHumanBytes ---
+
+        [Theory]
+        [InlineData("1 MB", 1000000, UnitStandard.SI)]
+        [InlineData("1 MiB", 1048576, UnitStandard.IEC)]
+        public void TryParseHumanBytes_ValidInput_ShouldReturnTrue(string input, long expected, UnitStandard standard)
+        {
+            bool success = input.TryParseHumanBytes(out long result, standard);
+            Assert.True(success);
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("1 XB", UnitStandard.SI)]
+        [InlineData("ten MB", UnitStandard.SI)]
+        [InlineData("1.2.3 GB", UnitStandard.IEC)]
+        [InlineData(" ", UnitStandard.SI)]
+        [InlineData(null, UnitStandard.IEC)]
+        public void TryParseHumanBytes_InvalidInputs_ShouldReturnFalse(string input, UnitStandard standard)
+        {
+            bool success = input.TryParseHumanBytes(out long result, standard);
+            Assert.False(success);
+            Assert.Equal(0, result);
+        }
+
+        // --- Round-trip consistency ---
+
+        [Theory]
+        [InlineData(1, UnitStandard.IEC)]
+        [InlineData(1024, UnitStandard.IEC)]          // 1 KiB
+        [InlineData(1048576, UnitStandard.IEC)]       // 1 MiB
+        [InlineData(1000, UnitStandard.SI)]           // 1 KB
+        [InlineData(1_000_000, UnitStandard.SI)]      // 1 MB
+        public void RoundTrip_BytesToHumanAndBack_ShouldBeConsistent(long original, UnitStandard standard)
+        {
+            string human = original.ToHumanBytes(2, standard);
+            long parsed = human.ToBytes(standard);
+
+            Assert.Equal(original, parsed);
         }
     }
 }
