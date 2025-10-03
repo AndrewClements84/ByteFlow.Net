@@ -144,6 +144,24 @@ namespace ByteFlow.Tests
 
         // --- TryParseHumanBytes ---
 
+        [Fact]
+        public void TryParseHumanBytes_DefaultOverload_ShouldReturnTrue()
+        {
+            bool success = "1 KiB".TryParseHumanBytes(out long result);
+
+            Assert.True(success);
+            Assert.Equal(1024, result); // uses default IEC
+        }
+
+        [Fact]
+        public void TryParseHumanBytes_DefaultOverload_ShouldReturnFalseOnInvalid()
+        {
+            bool success = "invalid".TryParseHumanBytes(out long result);
+
+            Assert.False(success);
+            Assert.Equal(0, result);
+        }
+
         [Theory]
         [InlineData("1 MB", 1000000, UnitStandard.SI)]
         [InlineData("1 MiB", 1048576, UnitStandard.IEC)]
