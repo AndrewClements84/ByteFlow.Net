@@ -9,34 +9,37 @@
 [![NuGet Version](https://img.shields.io/nuget/v/ByteFlow.Net.svg?logo=nuget&cacheSeconds=300)](https://www.nuget.org/packages/ByteFlow.Net)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/ByteFlow.Net.svg)](https://www.nuget.org/packages/ByteFlow.Net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
+![GitHub Repo stars](https://img.shields.io/github/stars/AndrewClements84/ByteFlow.Net?style=flat&color=2bbc8a)
 
-A lightweight .NET library for converting bytes into **human-readable formats** (KB, MB, GB, etc.) and back again.
+A lightweight .NET library for converting bytes into **human-readable
+formats** (KB, MB, GB, etc.) and back again.
 
----
+------------------------------------------------------------------------
 
 ## ✨ Features
 
-- Convert bytes into human-readable strings (`1234567 → "1.18 MB"`).
-- Parse strings back into bytes (`"2.5 GB" → 2684354560`).
-- Safe parsing with `TryParseHumanBytes`.
-- Zero dependencies, just clean C#.
-- Works on .NET Framework (4.6.1+) and all modern .NET versions (Core, 5/6/7/8).
+-   Convert bytes into human-readable strings (`1234567 → "1.18 MB"`).
+-   Parse strings back into bytes (`"2.5 GB" → 2684354560`).
+-   Safe parsing with `TryParseHumanBytes`.
+-   Zero dependencies, just clean C#.
+-   Works on .NET Framework (4.6.1+) and all modern .NET versions (Core,
+    5/6/7/8).
 
----
+------------------------------------------------------------------------
 
 ## 📦 Installation
 
 Install from [NuGet](https://www.nuget.org/packages/ByteFlow.Net):
 
-```sh
+``` sh
 dotnet add package ByteFlow.Net
 ```
 
----
+------------------------------------------------------------------------
 
 ## 🚀 Usage
 
-```csharp
+``` csharp
 using ByteFlowNet;
 
 // Convert bytes to human-readable string
@@ -55,45 +58,60 @@ if ("10 MB".TryParseHumanBytes(out var val))
 }
 ```
 
----
+------------------------------------------------------------------------
 
 ## 🧪 Unit Tests
 
-Unit tests are included under the `tests/ByteFlowNet.Tests` project using **xUnit**.
+Unit tests are included under the `tests/ByteFlowNet.Tests` project
+using **xUnit**.
 
 Run them with:
 
-```sh
+``` sh
 dotnet test
 ```
 
----
+------------------------------------------------------------------------
 
 ## 📊 Code Coverage
 
-Code coverage reports are automatically uploaded to [Codecov](https://app.codecov.io/gh/AndrewClements84/ByteFlow.Net).  
+Code coverage reports are automatically uploaded to
+[Codecov](https://app.codecov.io/gh/AndrewClements84/ByteFlow.Net).\
 Current coverage: **100%** ✅
 
----
+------------------------------------------------------------------------
 
 ## 🔮 Roadmap
 
 Planned features for upcoming releases:
 
-- [ ] Support for both **IEC (binary: KiB, MiB)** and **SI (decimal: KB, MB)** unit standards  
-- [ ] Culture-aware parsing (e.g., commas vs dots for decimals)  
-- [ ] Customizable suffix sets (allowing non-standard units)  
-- [ ] Performance benchmarking and optimizations for very large inputs  
-- [ ] Additional helpers for formatting with alignment/padding  
+-   [ ] Support for both **IEC (binary: KiB, MiB)** and **SI (decimal:
+    KB, MB)** unit standards\
+-   [ ] Culture-aware parsing (e.g., commas vs dots for decimals)\
+-   [ ] Customizable suffix sets (allowing non-standard units)\
+-   [ ] Performance benchmarking and optimizations for very large
+    inputs\
+-   [ ] Additional helpers for formatting with alignment/padding
 
----
+------------------------------------------------------------------------
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome!  
-Feel free to open a [discussion](https://github.com/AndrewClements84/ByteFlow.Net/discussions) or a [pull request](https://github.com/AndrewClements84/ByteFlow.Net/pulls).
+Contributions, issues, and feature requests are welcome!\
+Feel free to open a
+[discussion](https://github.com/AndrewClements84/ByteFlow.Net/discussions)
+or a [pull
+request](https://github.com/AndrewClements84/ByteFlow.Net/pulls).
 
----
+------------------------------------------------------------------------
+
+## ⭐ Support
+
+If you find **ByteFlow.Net** useful, please consider giving it a star on
+GitHub --- it helps others discover the project and shows your support.
+
+------------------------------------------------------------------------
+
 
 ## 📄 License
 
